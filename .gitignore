@@ -163,4 +163,4 @@ cython_debug/
 
 # AI1 Project Specific
 inputs/
-outputs/
+outputs*/
