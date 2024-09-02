@@ -2,6 +2,10 @@ import json
 
 # import and setup GPT4All
 from gpt4all import GPT4All
+import openlit
+
+openlit.init(otlp_endpoint="http://127.0.0.1:4318")
+# openlit.init(collect_gpu_stats=True)
 
 model = GPT4All(
     "orca-mini-3b-gguf2-q4_0.gguf",  # downloads / loads a 1.98GB LLM
