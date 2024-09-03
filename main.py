@@ -4,6 +4,8 @@ import json
 from gpt4all import GPT4All
 import openlit
 
+from slugify import slugify
+
 openlit.init(otlp_endpoint="http://127.0.0.1:4318", collect_gpu_stats=True)
 
 model = GPT4All(
@@ -48,6 +50,10 @@ for game in data:
             max_tokens=4096,
         )
 
-    fpOutput = open("outputs/" + str(BGGID) + "_Review.txt", "x", encoding="utf8")
+    fpOutput = open(
+        "outputs/" + str(BGGID) + "_" + slugify(name) + "_Review.txt",
+        "x",
+        encoding="utf8",
+    )
     fpOutput.write(review)
     fpOutput.close()
