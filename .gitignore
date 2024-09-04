@@ -162,5 +162,6 @@ cython_debug/
 #.idea/
 
 # AI1 Project Specific
+data
 data/
 outputs*/
