@@ -14,7 +14,7 @@ model = GPT4All(
 )
 
 # Select JSON input
-fpInput = open("data/DW_Games.json", "r", encoding="utf8")
+fpInput = open("data/BBG/RankedGames.json", "r", encoding="utf8")
 # print(fp.read())
 fileContent = fpInput.read()
 
@@ -27,8 +27,9 @@ for game in data:
 
     # Extract: name, BGGID, publisher(s), categories
     name = str(game["name"])
-    BGGID = game["id"]
+    BGGID = game["bGGid"]
     description = game["description"]
+    rating = game["rating"]
     # print("Game " + name + " with BGG ID " + str(BGGID))
 
     with model.chat_session(
@@ -54,7 +55,9 @@ You are an AI reviewer of board games. When a human gives you a board game title
             + "of the section titled ' who's it for?' and list which sort of people will enjoy the game and its ideal age group. "
             + "a section of 'critisisms'. this section includes at least one negative about the game. "
             + "the final section will be called 'conclusion' and give a roundup of the game. "
-            + "Please add a user score out of 10 to the end of the article with a 5 point rundown of notable features of the game. "
+            + "Please add a user score of "
+            + str(rating)
+            + " to the end of the article with a 5 point rundown of notable features of the game. "
             + "Here is a description of the game: "
             + description,
             max_tokens=4096,
