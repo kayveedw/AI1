@@ -6,6 +6,8 @@ import openlit
 
 from slugify import slugify
 
+import os.path
+
 openlit.init(otlp_endpoint="http://127.0.0.1:4318", collect_gpu_stats=True)
 
 model = GPT4All(
@@ -32,41 +34,44 @@ for game in data:
     rating = game["rating"]
     # print("Game " + name + " with BGG ID " + str(BGGID))
 
-    with model.chat_session(
-        system_prompt="""### System:
+    outputFileName = "outputs/" + str(BGGID) + "_" + slugify(name) + "_Review.txt"
+    if not os.path.isfile(outputFileName):
+
+        with model.chat_session(
+            system_prompt="""### System:
 You are an AI reviewer of board games. When a human gives you a board game title and its description, you respond with the review.""",
-        prompt_template="""### Human:
+            prompt_template="""### Human:
 {0}
 
 ### Assistant:
 """,
-    ):
-        review = model.generate(
-            "write me a review of the board game "
-            + name
-            + ". the review must include the following sections: 'overview' this section should be maximum 2 paragraphs. "
-            + "'the game at a glance' this section should be a list of game mechanics, genre and suitable age. "
-            + "The next section 'game mechanics' should be 2 or 3 paragraphs long with a list of game mechanics at the end "
-            + "with an explanation of each mechanic. "
-            + "the next section will be 'components and artwork' this section should be 2 or 3 paragraphs long "
-            # + "and have a list at the end of the section entitled 'whats in the box' and list out all the games components. "
-            + "the next section will be 'replayability and depth'. this section should be 2 or 3 paragraphs long. "
-            + "the next section should be called 'accessability and fun factor' this section should be 2 or 3 paragraphs long and have a list at the end "
-            + "of the section titled ' who's it for?' and list which sort of people will enjoy the game and its ideal age group. "
-            + "a section of 'critisisms'. this section includes at least one negative about the game. "
-            + "the final section will be called 'conclusion' and give a roundup of the game. "
-            + "Please add a user score of "
-            + str(rating)
-            + " to the end of the article with a 5 point rundown of notable features of the game. "
-            + "Here is a description of the game: "
-            + description,
-            max_tokens=4096,
-        )
+        ):
+            review = model.generate(
+                "write me a review of the board game "
+                + name
+                + ". the review must include the following sections: 'overview' this section should be maximum 2 paragraphs. "
+                + "'the game at a glance' this section should be a list of game mechanics, genre and suitable age. "
+                + "The next section 'game mechanics' should be 2 or 3 paragraphs long with a list of game mechanics at the end "
+                + "with an explanation of each mechanic. "
+                + "the next section will be 'components and artwork' this section should be 2 or 3 paragraphs long "
+                # + "and have a list at the end of the section entitled 'whats in the box' and list out all the games components. "
+                + "the next section will be 'replayability and depth'. this section should be 2 or 3 paragraphs long. "
+                + "the next section should be called 'accessability and fun factor' this section should be 2 or 3 paragraphs long and have a list at the end "
+                + "of the section titled ' who's it for?' and list which sort of people will enjoy the game and its ideal age group. "
+                + "a section of 'critisisms'. this section includes at least one negative about the game. "
+                + "the final section will be called 'conclusion' and give a roundup of the game. "
+                + "Please add a user score of "
+                + str(rating)
+                + " to the end of the article with a 5 point rundown of notable features of the game. "
+                + "Here is a description of the game: "
+                + description,
+                max_tokens=4096,
+            )
 
-    fpOutput = open(
-        "outputs/" + str(BGGID) + "_" + slugify(name) + "_Review.txt",
-        "x",
-        encoding="utf8",
-    )
-    fpOutput.write(review)
-    fpOutput.close()
+        fpOutput = open(
+            outputFileName,
+            "x",
+            encoding="utf8",
+        )
+        fpOutput.write(review)
+        fpOutput.close()
