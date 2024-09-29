@@ -6,12 +6,9 @@ import openlit
 
 import os.path
 
-openlit.init(otlp_endpoint="http://127.0.0.1:4318", collect_gpu_stats=True)
+from bs4 import BeautifulSoup
 
-model = GPT4All(
-    "Nous-Hermes-2-Mistral-7B-DPO.Q4_0.gguf",  # downloads / loads a 4.11GB LLM
-    device="cuda:NVIDIA GeForce RTX 3060",
-)
+openlit.init(otlp_endpoint="http://127.0.0.1:4318", collect_gpu_stats=True)
 
 # Select JSON input
 fpInput = open("data/BBG/RankedGames.json", "r", encoding="utf8")
@@ -30,11 +27,21 @@ for game in data:
     BGGID = game["bGGid"]
     slug = game["slug"]
     description = game["description"]
+    soup = BeautifulSoup(description, "html.parser")
+    descriptionTextOnly = soup.get_text()
+
     rating = game["rating"]
     # print("Game " + name + " with BGG ID " + str(BGGID))
 
     outputFileName = "outputs/" + str(BGGID) + "_" + slug + "_Review.txt"
     if not os.path.isfile(outputFileName):
+
+        model = GPT4All(
+            # "orca-mini-3b-gguf2-q4_0.gguf",  # downloads / loads a 1.98GB LLM
+            "Nous-Hermes-2-Mistral-7B-DPO.Q4_0.gguf",  # downloads / loads a 4.11GB LLM
+            device="cuda:NVIDIA GeForce RTX 3060",
+            n_ctx=4096,
+        )
 
         with model.chat_session(
             system_prompt="""### System:
@@ -61,9 +68,9 @@ You are an AI reviewer of board games. When a human gives you a board game title
                 + "the final section will be called 'conclusion' and give a roundup of the game. "
                 + "Please add a user score of "
                 + str(rating)
-                + " to the end of the article with a 5 point rundown of notable features of the game. "
+                + "/100 to the end of the article with a 5 point rundown of notable features of the game. "
                 + "Here is a description of the game: "
-                + description,
+                + descriptionTextOnly,
                 max_tokens=4096,
             )
 
