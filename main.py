@@ -31,10 +31,10 @@ for game in data:
     descriptionTextOnly = soup.get_text()
 
     rating = game["rating"]
-    # print("Game " + name + " with BGG ID " + str(BGGID))
 
     outputFileName = "outputs/" + str(BGGID) + "_" + slug + "_Review.txt"
     if not os.path.isfile(outputFileName):
+        print("Game " + name + " with BGG ID " + str(BGGID))
 
         model = GPT4All(
             # "orca-mini-3b-gguf2-q4_0.gguf",  # downloads / loads a 1.98GB LLM
@@ -66,13 +66,15 @@ You are an AI reviewer of board games. When a human gives you a board game title
                 + "of the section titled ' who's it for?' and list which sort of people will enjoy the game and its ideal age group. "
                 + "a section of 'critisisms'. this section includes at least one negative about the game. "
                 + "the final section will be called 'conclusion' and give a roundup of the game. "
-                + "Please add a user score of "
+                + "You must add a user score of "
                 + str(rating)
                 + "/100 to the end of the article with a 5 point rundown of notable features of the game. "
                 + "Here is a description of the game: "
                 + descriptionTextOnly,
                 max_tokens=4096,
             )
+
+        model.close()
 
         fpOutput = open(
             outputFileName,
