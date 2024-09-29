@@ -4,8 +4,6 @@ import json
 from gpt4all import GPT4All
 import openlit
 
-from slugify import slugify
-
 import os.path
 
 openlit.init(otlp_endpoint="http://127.0.0.1:4318", collect_gpu_stats=True)
@@ -30,11 +28,12 @@ for game in data:
     # Extract: name, BGGID, publisher(s), categories
     name = str(game["name"])
     BGGID = game["bGGid"]
+    slug = game["slug"]
     description = game["description"]
     rating = game["rating"]
     # print("Game " + name + " with BGG ID " + str(BGGID))
 
-    outputFileName = "outputs/" + str(BGGID) + "_" + slugify(name) + "_Review.txt"
+    outputFileName = "outputs/" + str(BGGID) + "_" + slug + "_Review.txt"
     if not os.path.isfile(outputFileName):
 
         with model.chat_session(
